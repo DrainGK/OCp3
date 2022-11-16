@@ -6,12 +6,11 @@ async function fetchProjects() {
     .then((res) => res.json())
     .then((data) => (projectsData = data));
   //   console.log(projectsData);
-  projectsDisplay();
+  projectsDisplay(projectsData);
 }
 
-function projectsDisplay() {
-  projectsContainer.innerHTML = projectsData
-    // .filter((project) => project.categoryId === 3)
+function projectsDisplay(projects) {
+  projectsContainer.innerHTML = projects
     .map(
       (project) =>
         `
@@ -34,7 +33,7 @@ filterBtns.forEach(function (btn) {
       if (project.category.name === categories) {
         return project;
       }
-      console.log(project);
+      // console.log(project);
     });
     console.log(projectCategory);
     if (categories === "Tous") {
