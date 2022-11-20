@@ -1,19 +1,45 @@
+
+// Function to do ajax request post method using fetch
+function get_token(email, password) {
+    fetch('http://localhost:5678/api/users/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            // Pour les requetes api qui ont besoin du token 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+        },
+        body: JSON.stringify({
+            'email': email,
+            'password': password
+        })
+    })
+    .then(response => {
+        switch (response.status) {
+            case 200:
+                return response.json();
+            case 401:
+            case 404:
+                throw new Error('Invalid credentials');
+            default:
+                throw new Error('Something went wrong');
+        }
+    })
+    .then(data => {
+        if (data.token !== undefined && data.token !== "") {
+            sessionStorage.setItem("token", data.token);
+            window.location.href = "/FrontEnd/index.html";
+        }
+    })
+    .catch(error => console.error(error))
+}
+
 const loginForm = document.getElementById("login-form");
 const loginButton = document.getElementById("login-submit");
 
-// fetch("http://localhost:5678/api/works")
-//   .then((res) => res.json())
-//   .then((data) => console.log(data));
-
 loginButton.addEventListener("click", (e) => {
-  e.preventDefault();
-  const username = document.getElementById("E-mail").value;
-  const password = document.getElementById("password").value;
+    e.preventDefault();
+    const email = document.getElementById("E-mail").value;
+    const password = document.getElementById("password").value;
 
-  if (username === "sophie.bluel@test.tldr" && password === "S0phie") {
-    alert("You have successfully logged in.");
-    window.location = "index.html";
-  } else {
-    alert("email ou mot de passe incorrect");
-  }
+    get_token(email, password);
+
 });
