@@ -40,9 +40,6 @@ function galleryDisplay(projects) {
   console.log(projects);
 }
 
-const title = document.getElementById("add_title");
-const newProjectCategory = document.getElementById("category");
-
 const filterBtns = document.querySelectorAll(".btn");
 
 filterBtns.forEach(function (btn) {
@@ -135,6 +132,21 @@ async function deleteProject(id) {
   projectsDisplay(projectsData);
   galleryDisplay(projectsData);
 }
+// const titleChecker = (value) => {
+//   console.log(value);
+// };
+
+// const titleInput = document.getElementById("add_title");
+
+// titleInput.addEventListener("input", (e) => {
+//   titleChecker(e.target.value);
+// });
+
+let titleInput = document.getElementById("add_title").value;
+console.log(titleInput);
+
+let newProjectCategory = document.querySelector("#selection").value;
+console.log(newProjectCategory);
 
 async function postProject() {
   let token = sessionStorage.getItem("token");
@@ -187,8 +199,20 @@ addPhotosBtn.addEventListener("click", (e) => {
   clickPhotoBtn.click();
 });
 
-const newProjectBtn = document.getElementById("submit-photo-id");
+const newProjectBtn = document.getElementById("submit-photo-btn");
 
 newProjectBtn.addEventListener("click", (e) => {
   e.preventDefault;
+});
+
+const newProjectForm = document.querySelector("#form_category");
+
+newProjectForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(newProjectForm);
+
+  for (item of formData) {
+    console.log(item[0], item[1]);
+  }
 });
