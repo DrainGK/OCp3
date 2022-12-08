@@ -32,6 +32,9 @@ body {
     line-height: 1;
     width: 100vw;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .modale-back{
@@ -50,8 +53,8 @@ body {
     border-radius: 10px;
     width: 630px;
     height: 731px;
-    transform: translate(50%, 80%);
     z-index: 12;
+    transform: translate(75%, 50%);
 }
 
 .modale-container{
@@ -61,11 +64,17 @@ body {
     align-items: center;
 }
 
-.modale-container h2{
+#form_category{
+    align-items: left;
+}
+
+.modale-container h2, .add-photo h2{
     margin-top: 2em;
     margin-bottom: 2em;
     position: relative;
+    text-align: center;
 }
+
 
 .gallery-photo{
     width: 70%;
@@ -247,16 +256,16 @@ table {
 }
 /** end reset css**/
 body {
-    max-width: 1140px;
-    /* margin:auto; */
     font-family: 'Work Sans' ;
     font-size: 14px;
 }
-header {
+header{
     display: flex;
+    width: 90%;
+    align-items: center;
     justify-content: space-between;
     margin: 50px 0;
-	margin-left: 50px;
+	/* margin-left: 50px; */
 }
 
 #modify-bar{
@@ -300,7 +309,8 @@ section {
 }
 
 main{
-	margin-left: 100px;
+	/* margin-left: 100px; */
+    position: relative;
 }
 
 h1{
@@ -350,7 +360,6 @@ li:hover {
 }
 #introduction img {
     display: block;
-    margin: auto;
     width: 80%;
 }
 
@@ -480,4 +489,9 @@ footer nav ul {
 
 .hidden {
     display: none;
+}
+
+.content {
+    max-width: 80%;
+    margin: 0 auto;
 }

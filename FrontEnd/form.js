@@ -28,11 +28,13 @@ function get_token(email, password) {
         window.location.href = "index.html";
       }
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      alert("pd");
+    });
 }
 
-const loginForm = document.getElementById("login-form");
 const loginButton = document.getElementById("login-submit");
+const loginForm = document.getElementById("login-form");
 
 loginButton.addEventListener("click", (e) => {
   e.preventDefault();

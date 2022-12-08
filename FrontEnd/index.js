@@ -5,39 +5,80 @@ let projectsData = [];
 async function fetchProjects() {
   await fetch("http://localhost:5678/api/works")
     .then((res) => res.json())
-    .then((data) => (projectsData = data));
-  projectsDisplay(projectsData);
-  galleryDisplay(projectsData);
+    .then((data) => {
+      projectsData = data;
+      projectsDisplay(projectsData);
+      galleryDisplay(projectsData);
+    });
 }
 
 function projectsDisplay(projects) {
-  projectsContainer.innerHTML = projects
-    .map(
-      (project) =>
-        `
-            <figure>
-            <img crossorigin="anonymous" src=${project.imageUrl} alt="photo ${project.title}">
-             <figcaption>${project.title}</figcaption>
-                                                                                            </figure>
-            `
-    )
-    .join("");
+  while (projectsContainer.firstChild)
+    projectsContainer.removeChild(projectsContainer.firstChild);
+
+  projects.forEach((project) => {
+    figure = document.createElement("figure");
+
+    img = document.createElement("img");
+    img.setAttribute("crossorigin", "anonymous");
+    img.setAttribute("src", project.imageUrl);
+    img.setAttribute("alt", project.title);
+
+    figcaption = document.createElement("figcaption");
+    title = document.createTextNode(project.title);
+    figcaption.appendChild(title);
+
+    figure.appendChild(img);
+    figure.appendChild(figcaption);
+
+    projectsContainer.appendChild(figure);
+  });
 }
 
 function galleryDisplay(projects) {
-  galleryContainer.innerHTML = projects
-    .map(
-      (project) =>
-        `
-          <div class="photos-card">
-            <div id="binIcon" class="bin" onclick="deleteProject(${project.id})"> <i class="fa-regular fa-trash-can"></i> </div>
-            <img id="modale-photos" crossorigin="anonymous" src=${project.imageUrl} alt="photo ${project.title}">
-            <a>éditer</a>
-          </div>
-          `
-    )
-    .join("");
-  console.log(projects);
+  while (galleryContainer.firstChild)
+    galleryContainer.removeChild(galleryContainer.firstChild);
+
+  projects.forEach((image) => {
+    photosCard = document.createElement("div");
+    photosCard.classList.add("photos-card");
+    photosCard.dataset.id = image.id;
+
+    binIconContainer = document.createElement("button");
+    binIconContainer.setAttribute("type", "button");
+    binIconContainer.classList.add("bin");
+    binIconContainer.setAttribute("id", "binIcon");
+    binIconContainer.addEventListener(
+      "click",
+      (e) => {
+        deleteProject(image.id, photosCard);
+      },
+      false
+    );
+
+    icon = document.createElement("i");
+    classIcon = ["fa-regular", "fa-trash-can"];
+    icon.classList.add(...classIcon);
+
+    binIconContainer.appendChild(icon);
+
+    img = document.createElement("img");
+    img.setAttribute("id", "modale-photos");
+    img.setAttribute("crossorigin", "anonymous");
+    img.setAttribute("src", image.imageUrl);
+    img.setAttribute("alt", image.title);
+
+    editLink = document.createElement("a");
+    editText = document.createTextNode("éditer");
+
+    editLink.appendChild(editText);
+
+    photosCard.appendChild(binIconContainer);
+    photosCard.appendChild(img);
+    photosCard.appendChild(editLink);
+
+    galleryContainer.appendChild(photosCard);
+  });
 }
 
 const filterBtns = document.querySelectorAll(".btn");
@@ -78,46 +119,66 @@ if (isConnected()) {
 
 function logout() {
   sessionStorage.removeItem("token");
+  window.location.href = "index.html";
 }
 
 const modifyGallery = document.getElementById("modify-icon-2");
 
 modifyGallery.addEventListener("click", (e) => {
+  e.preventDefault();
+  // disableScrolling();
   document.querySelector(".modale").classList.toggle("hidden");
   document.querySelector(".modale-container").classList.toggle("hidden");
   document.querySelector(".modale-back").classList.toggle("hidden");
-  e.preventDefault();
 });
 
-const closeModale = document.getElementById("cross-icon");
+function closeModale(elt) {
+  elt.closest(".modale").classList.toggle("hidden");
+  elt.closest(".modale-container").classList.toggle("hidden");
+  document.querySelector(".modale-back").classList.toggle("hidden");
+  // enableScrolling();
+}
 
-closeModale.addEventListener("click", (e) => {
+const closeCross = document.querySelectorAll(".cross");
+
+closeCross.forEach((elt) => {
+  elt.addEventListener("click", function (e) {
+    e.preventDefault();
+    closeModale(this);
+  });
+});
+
+const overlay = document.querySelector(".modale-back");
+
+overlay.addEventListener("click", function (e) {
+  e.preventDefault();
   document.querySelector(".modale").classList.toggle("hidden");
   document.querySelector(".modale-container").classList.toggle("hidden");
   document.querySelector(".modale-back").classList.toggle("hidden");
-  e.preventDefault();
 });
 
-const addPhotos = document.getElementById("btn-photo");
+const addPhotos = document.querySelector("#btn-photo");
 
 addPhotos.addEventListener("click", (e) => {
+  e.preventDefault();
+  fetchProjects();
   document.querySelector(".modale-container").classList.toggle("hidden");
   document.querySelector(".add-photo").classList.toggle("hidden");
-  e.preventDefault();
 });
+
 const previousModale = document.getElementById("left-arrow");
 
 previousModale.addEventListener("click", (e) => {
-  document.querySelector(".add-photo").classList.toggle("hidden");
-  document.querySelector(".modale-container").classList.toggle("hidden");
   e.preventDefault();
+  backModale();
 });
 
-function deleteProject(id) {
-  deleteProject(id);
+function backModale() {
+  document.querySelector(".add-photo").classList.toggle("hidden");
+  document.querySelector(".modale-container").classList.toggle("hidden");
 }
 
-async function deleteProject(id) {
+async function deleteProject(id, elt) {
   let token = sessionStorage.getItem("token");
 
   await fetch(`http://localhost:5678/api/works/${id}`, {
@@ -127,53 +188,19 @@ async function deleteProject(id) {
       "Content-Type": "application/json",
     },
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (res.ok) {
+        elt.remove();
+        fetchProjects();
+      }
+    })
     .then((data) => (projectsData = data));
-  projectsDisplay(projectsData);
-  galleryDisplay(projectsData);
-}
-// const titleChecker = (value) => {
-//   console.log(value);
-// };
-
-// const titleInput = document.getElementById("add_title");
-
-// titleInput.addEventListener("input", (e) => {
-//   titleChecker(e.target.value);
-// });
-
-let titleInput = document.getElementById("add_title").value;
-console.log(titleInput);
-
-let newProjectCategory = document.querySelector("#selection").value;
-console.log(newProjectCategory);
-
-async function postProject() {
-  let token = sessionStorage.getItem("token");
-
-  await fetch("http://localhost:5678/api/works", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      // Pour les requetes api qui ont besoin du token 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-    },
-    body: JSON.stringify({
-      categoryId: newProjectCategory.value,
-      title: title.value,
-      imageUrl: `url(${uploaded_image})`,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => (projectsData = data));
-  projectsDisplay(projectsData);
-  galleryDisplay(projectsData);
 }
 
 const image_input = document.querySelector("#image_input");
-var uploaded_image = "";
 
 image_input.addEventListener("change", function () {
+  var uploaded_image = "";
   const reader = new FileReader();
   reader.addEventListener("load", () => {
     uploaded_image = reader.result;
@@ -195,24 +222,22 @@ image_input.addEventListener("change", function () {
 const addPhotosBtn = document.getElementById("add-photo-btn");
 
 addPhotosBtn.addEventListener("click", (e) => {
-  const clickPhotoBtn = document.getElementById("image_input");
-  clickPhotoBtn.click();
-});
-
-const newProjectBtn = document.getElementById("submit-photo-btn");
-
-newProjectBtn.addEventListener("click", (e) => {
-  e.preventDefault;
-});
-
-const newProjectForm = document.querySelector("#form_category");
-
-newProjectForm.addEventListener("submit", (e) => {
   e.preventDefault();
+  document.getElementById("image_input").click();
+});
 
-  const formData = new FormData(newProjectForm);
+document.querySelector("form[name='form']").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
 
-  for (item of formData) {
-    console.log(item[0], item[1]);
-  }
+  fetch("http://localhost:5678/api/works", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + sessionStorage.getItem("token"),
+    },
+    body: formData,
+  }).then(() => {
+    backModale();
+    fetchProjects();
+  });
 });
