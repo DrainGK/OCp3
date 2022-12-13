@@ -29,7 +29,7 @@ function get_token(email, password) {
       }
     })
     .catch((error) => {
-      alert("pd");
+      alert("Identifiants ou mot de passe invalide");
     });
 }
 
